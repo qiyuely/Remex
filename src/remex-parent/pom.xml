@@ -8,4 +8,29 @@
   <modules>
   	<module>remex-core</module>
   </modules>
+  
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+			<groupId>org.apache.commons</groupId>
+	    	<artifactId>commons-lang3</artifactId>
+	    	<version>3.6</version>
+		</dependency>
+		<dependency>
+		    <groupId>commons-collections</groupId>
+		    <artifactId>commons-collections</artifactId>
+		    <version>3.2.1</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-api</artifactId>
+		    <version>1.7.25</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-context-support</artifactId>
+		    <version>4.3.11.RELEASE</version>
+		</dependency>
+  	</dependencies>
+  </dependencyManagement>
 </project>
