@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.qiyuely</groupId>
+  <groupId>com.qiyuely.remex</groupId>
   <artifactId>remex-parent</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
   	<module>remex-core</module>
+  	<module>remex-poi</module>
   </modules>
+  
+  <properties>
+  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<encoding>UTF-8</encoding>
+	<remex.version>0.0.1-SNAPSHOT</remex.version>
+	<poi.version>3.17</poi.version>
+  </properties>
   
   <dependencyManagement>
   	<dependencies>
+  		<!-- remex -->
+  		<dependency>
+			<groupId>com.qiyuely.remex</groupId>
+	    	<artifactId>remex-core</artifactId>
+	    	<version>${remex.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.qiyuely.remex</groupId>
+	    	<artifactId>remex-poi</artifactId>
+	    	<version>${remex.version}</version>
+		</dependency>
+  		<!-- remex -->
+  		
   		<dependency>
 			<groupId>org.apache.commons</groupId>
 	    	<artifactId>commons-lang3</artifactId>
@@ -31,6 +52,29 @@
 		    <artifactId>spring-context-support</artifactId>
 		    <version>4.3.11.RELEASE</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi</artifactId>
+		    <version>${poi.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi-ooxml</artifactId>
+		    <version>${poi.version}</version>
+		</dependency>
   	</dependencies>
   </dependencyManagement>
+  
+  <distributionManagement>
+	<snapshotRepository>
+		<id>tms-snapshot</id>
+		<name>tms-snapshot</name>
+		<url>http://10.10.1.30:8081/repository/maven-snapshots/</url>
+	</snapshotRepository>
+	<repository>
+		<id>tms-releases</id>
+		<name>tms-releases</name>
+		<url>http://10.10.1.30:8081/repository/maven-releases/</url>
+	</repository>
+  </distributionManagement>
 </project>

@@ -7,18 +7,25 @@
     <artifactId>remex-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>remex-core</artifactId>
+  <artifactId>remex-poi</artifactId>
+  
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <remex.version>0.0.1-SNAPSHOT</remex.version>
   </properties>
   <dependencies>
   	<dependency>
-		<groupId>org.apache.commons</groupId>
-    	<artifactId>commons-lang3</artifactId>
+		<groupId>com.qiyuely.remex</groupId>
+    	<artifactId>remex-core</artifactId>
+	</dependency>
+	
+	<dependency>
+	    <groupId>org.apache.poi</groupId>
+	    <artifactId>poi</artifactId>
 	</dependency>
 	<dependency>
-	    <groupId>commons-collections</groupId>
-	    <artifactId>commons-collections</artifactId>
+	    <groupId>org.apache.poi</groupId>
+	    <artifactId>poi-ooxml</artifactId>
 	</dependency>
   </dependencies>
 </project>
