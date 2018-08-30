@@ -40,6 +40,7 @@ public class PoiWriteDefaultStyle implements IPoiWriteStyle {
 	public CellStyle getDataStyle(Workbook workbook) {
 		CellStyle style = workbook.createCellStyle();
 		style.setFont(getDataFont(workbook));  //设置内容字体样式
+		style.setAlignment(HorizontalAlignment.CENTER);  //居中
 		return style;
 	}
 
@@ -49,7 +50,7 @@ public class PoiWriteDefaultStyle implements IPoiWriteStyle {
 	@Override
 	public Font getDataFont(Workbook workbook) {
 		Font font = workbook.createFont();
-		font.setFontHeightInPoints((short) 10);  //设置字体大小
+		font.setFontHeightInPoints((short) 12);  //设置字体大小
 		return font;
 	}
 

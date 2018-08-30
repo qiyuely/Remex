@@ -57,6 +57,6 @@ public class ValidateUtils {
 	 * @return true：不为空   false：为空
 	 */
 	public static boolean isNotEmpty(int[] arr) {
-		return isEmpty(arr);
+		return !isEmpty(arr);
 	}
 }
