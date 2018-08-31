@@ -1,5 +1,6 @@
 package com.qiyuely.remex.utils;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,6 +41,21 @@ public class DateUtils {
 	/** 日期格式化格式 - HH时mm分ss秒 */
 	public final static String PATTERN_CN_TIME = "HH时mm分ss秒";
 	
+	/**
+	 * 取得当前时间
+	 * @return
+	 */
+	public static Date getCurDate() {
+		return new Date();
+	}
+	
+	/**
+	 * 取得当前时间
+	 * @return
+	 */
+	public static Timestamp getCurTimestamp() {
+		return new Timestamp(System.currentTimeMillis());
+	}
 	
 	/**
 	 * 将日期转换为字符串
