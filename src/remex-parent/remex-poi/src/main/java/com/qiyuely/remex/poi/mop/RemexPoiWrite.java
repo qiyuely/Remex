@@ -1,13 +1,8 @@
 package com.qiyuely.remex.poi.mop;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import org.apache.poi.hssf.record.ObjectProtectRecord;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -18,7 +13,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.qiyuely.remex.core.constant.BConst;
+import com.qiyuely.remex.poi.diy.CellValPropertyFetch;
+import com.qiyuely.remex.poi.diy.PoiWriteCellDefaultDiy;
+import com.qiyuely.remex.poi.diy.PoiWriteRowDefaultDiy;
 import com.qiyuely.remex.poi.enums.PoiSupport;
 import com.qiyuely.remex.poi.exception.RemexPoiException;
 import com.qiyuely.remex.poi.interfaces.ICellValFetch;
@@ -26,9 +23,6 @@ import com.qiyuely.remex.poi.interfaces.IWriteCellDiy;
 import com.qiyuely.remex.poi.interfaces.IWriteRowDiy;
 import com.qiyuely.remex.poi.style.IPoiWriteStyle;
 import com.qiyuely.remex.poi.style.PoiWriteDefaultStyle;
-import com.qiyuely.remex.poi.val.CellValPropertyFetch;
-import com.qiyuely.remex.poi.val.PoiWriteCellDefaultDiy;
-import com.qiyuely.remex.poi.val.PoiWriteRowDefaultDiy;
 import com.qiyuely.remex.utils.CollectionUtils;
 import com.qiyuely.remex.utils.SourceCloseUtils;
 import com.qiyuely.remex.utils.ValidateUtils;
@@ -48,18 +42,15 @@ public class RemexPoiWrite {
 	private Sheet sheet;
 	
 	
+	/** 当前滚动的行下标 */
+	private int rowRollIndex = 0;
+	
 	
 	/** poi的支持操作类型，默认XSSF */
 	private PoiSupport poiSupport = PoiSupport.XSSF;
 	
 	/** poi导出样式设置 */	
 	private IPoiWriteStyle poiWriteStyle = new PoiWriteDefaultStyle();
-	
-	/** 写入行的默认的自定义处理 */
-	private IWriteRowDiy poiWriteRowDefaultDiy = null;
-	
-	/** 写入列的默认的自定义处理 */
-	private IWriteCellDiy poiWriteCellDefaultDiy = null;
 	
 	/**  默认行高度，默认乘256 */
 	private int rowDefaultHeight = 1;
@@ -70,35 +61,30 @@ public class RemexPoiWrite {
 	/** 列宽度集，默认乘256 */
 	protected int[] cellWidths;
 	
+	/** 写入行的默认的自定义处理 */
+	private IWriteRowDiy poiWriteRowDefaultDiy = null;
 	
-	/** 当前滚动的行下标 */
-	private int rowRollIndex = 0;
+	/** 写入列的默认的自定义处理 */
+	private IWriteCellDiy poiWriteCellDefaultDiy = null;
 	
-	public static void main(String[] args) throws Exception {
-		FileOutputStream os = new FileOutputStream(new File("E://b.xlsx"));
-		List<UrlEntity> list = new ArrayList<>();
-		for (int i = 0; i < 10; i++) {
-			UrlEntity entity = new UrlEntity();
-			entity.setId("id:" + i);
-			entity.setName("name:" + i);
-			list.add(entity);
-		}
-		String title = "excel导出";
-		int[] cellWidths = new int[] {8, 14, 18};
-		String[] colNames = new String[] {"id", "名称", "url"};
-		String[] properties = new String[] {"id", "name", "url"};
-		
-		RemexPoiWrite remexPoiWrite = new RemexPoiWrite().setCellWidths(cellWidths).build();
-		remexPoiWrite
-			.writeMerged(title, colNames.length)
-			.writeRow(colNames)
-			.writeDataList(list, properties)
-//			.writeDefaultTitle(title, colNames.length)
-//			.writeDefaultCellTitle(colNames)
-//			.writeDefaultDataList(list, properties)
-			.output(os);
-		System.out.println("======  end   ======");
-	}
+	/** 写入行的默认的标题的自定义处理 */
+	private IWriteRowDiy poiWriteRowDefaultTitleDiy = null;
+	
+	/** 写入列的默认的标题的自定义处理 */
+	private IWriteCellDiy poiWriteCellDefaultTitleDiy = null;
+	
+	/** 写入行的默认的列标题的自定义处理 */
+	private IWriteRowDiy poiWriteRowDefaultCellTitleDiy = null;
+	
+	/** 写入列的默认的列标题的自定义处理 */
+	private IWriteCellDiy poiWriteCellDefaultCellTitleDiy = null;
+	
+	/** 写入行的默认的数据的自定义处理 */
+	private IWriteRowDiy poiWriteRowDefaultDataDiy = null;
+	
+	/** 写入列的默认的数据的自定义处理 */
+	private IWriteCellDiy poiWriteCellDefaultDataDiy = null;
+
 	
 	/**
 	 * 构建poi导出excel处理器
@@ -115,6 +101,36 @@ public class RemexPoiWrite {
 		//写入列的默认的自定义处理
 		if (poiWriteCellDefaultDiy == null) {
 			poiWriteCellDefaultDiy = new PoiWriteCellDefaultDiy(poiWriteStyle.getCellStyle(workbook));
+		}
+		
+		//写入行的默认的标题的自定义处理
+		if (poiWriteRowDefaultTitleDiy == null) {
+			poiWriteRowDefaultTitleDiy = new PoiWriteRowDefaultDiy(2);
+		}
+		
+		//写入列的默认的标题的自定义处理
+		if (poiWriteCellDefaultTitleDiy == null) {
+			poiWriteCellDefaultTitleDiy = new PoiWriteCellDefaultDiy(poiWriteStyle.getTitleStyle(workbook));
+		}
+		
+		//写入行的默认的列标题的自定义处理
+		if (poiWriteRowDefaultCellTitleDiy == null) {
+			poiWriteRowDefaultCellTitleDiy = new PoiWriteRowDefaultDiy(1.8);
+		}
+
+		//写入列的默认的列标题的自定义处理
+		if (poiWriteCellDefaultCellTitleDiy == null) {
+			poiWriteCellDefaultCellTitleDiy = new PoiWriteCellDefaultDiy(poiWriteStyle.getCellTitleStyle(workbook));
+		}
+		
+		//写入行的默认的数据的自定义处理
+		if (poiWriteRowDefaultDataDiy == null) {
+			poiWriteRowDefaultDataDiy = new PoiWriteRowDefaultDiy(1.5);
+		}
+
+		//写入列的默认的数据的自定义处理
+		if (poiWriteCellDefaultDataDiy == null) {
+			poiWriteCellDefaultDataDiy = new PoiWriteCellDefaultDiy(poiWriteStyle.getDataStyle(workbook));
 		}
 
 		sheet = workbook.createSheet();
@@ -144,12 +160,33 @@ public class RemexPoiWrite {
 	 * @return
 	 */
 	public <T> RemexPoiWrite writeDefaultTitle(String title, int cellCount) {
-		writeMerged(title, cellCount);
+		writeMerged(title, cellCount, poiWriteRowDefaultTitleDiy, poiWriteCellDefaultTitleDiy);
 		
 		return this;
 	}
 	
+	/**
+	 * 写入默认的列标题
+	 * @param cellTitles 列标题值数组
+	 * @return
+	 */
+	public <T> RemexPoiWrite writeDefaultCellTitle(String[] cellTitles) {
+		writeRow(cellTitles, poiWriteRowDefaultCellTitleDiy, poiWriteCellDefaultCellTitleDiy);
+		
+		return this;
+	}
 	
+	/**
+	 * 写入默认的列表数据
+	 * @param dataList
+	 * @param properties
+	 * @return
+	 */
+	public <T> RemexPoiWrite writeDefaultDataList(List<T> dataList, String[] properties) {
+		writeDataList(dataList, properties, poiWriteRowDefaultDataDiy, poiWriteCellDefaultDataDiy);
+		
+		return this;
+	}
 	
 	
 	/**
@@ -159,10 +196,37 @@ public class RemexPoiWrite {
 	 * @return
 	 */
 	public <T> RemexPoiWrite writeDataList(List<T> dataList, String[] properties) {
+		writeDataList(dataList, properties, null, null);
+		
+		return this;
+	}
+	
+	/**
+	 * 写入列表数据
+	 * @param dataList 数据列表
+	 * @param properties 属性集
+	 * @return
+	 */
+	public <T> RemexPoiWrite writeDataList(List<T> dataList, String[] properties, IWriteRowDiy poiWriteRowDiy
+			, IWriteCellDiy poiWriteCellDiy) {
 		int cellCount = properties == null ? 0 : properties.length;
 		ICellValFetch<T> cellValFetch = new CellValPropertyFetch<>(properties);
 		
-		writeDataList(dataList, cellValFetch, cellCount);
+		writeDataList(dataList, cellValFetch, cellCount, poiWriteRowDiy, poiWriteCellDiy);
+		
+		return this;
+		
+	}
+	
+	/**
+	 * 写入列表数据
+	 * @param dataList 数据列表
+	 * @param cellValFetch 数据提取器
+	 * @param cellCount 数据的列数量
+	 * @return
+	 */
+	public <T> RemexPoiWrite writeDataList(List<T> dataList, ICellValFetch<T> cellValFetch, int cellCount) {
+		writeDataList(dataList, cellValFetch, cellCount, null, null);
 		
 		return this;
 	}
@@ -174,7 +238,8 @@ public class RemexPoiWrite {
 	 * @param cellCount 数据的列数量
 	 * @return
 	 */
-	public <T> RemexPoiWrite writeDataList(List<T> dataList, ICellValFetch<T> cellValFetch, int cellCount) {
+	public <T> RemexPoiWrite writeDataList(List<T> dataList, ICellValFetch<T> cellValFetch, int cellCount
+			, IWriteRowDiy poiWriteRowDiy, IWriteCellDiy poiWriteCellDiy) {
 		if (CollectionUtils.isNotEmpty(dataList) && cellCount >= 0) {
 			//行循环
 			for (int i = 0; i < dataList.size(); i++) {
@@ -195,7 +260,7 @@ public class RemexPoiWrite {
 
 				}
 
-				writeRowHandle(cellVals, i, rowRollIndex, poiWriteRowDefaultDiy, poiWriteCellDefaultDiy, true);
+				writeRowHandle(cellVals, i, rowRollIndex, poiWriteRowDiy, poiWriteCellDiy, true);
 			}
 		}
 		
@@ -206,7 +271,16 @@ public class RemexPoiWrite {
 	 * 写入一行数据
 	 */
 	public <T> RemexPoiWrite writeRow(Object[] rowCellVals) {
-		writeRowHandle(rowCellVals, 0, rowRollIndex, poiWriteRowDefaultDiy, poiWriteCellDefaultDiy, true);
+		writeRow(rowCellVals, null, null);
+		
+		return this;
+	}
+	
+	/**
+	 * 写入一行数据
+	 */
+	public <T> RemexPoiWrite writeRow(Object[] rowCellVals, IWriteRowDiy poiWriteRowDiy, IWriteCellDiy poiWriteCellDiy) {
+		writeRowHandle(rowCellVals, 0, rowRollIndex, poiWriteRowDiy, poiWriteCellDiy, true);
 		
 		return this;
 	}
@@ -215,10 +289,19 @@ public class RemexPoiWrite {
 	 * 写入一行数据
 	 */
 	public <T> RemexPoiWrite writeRowOneCell(Object cellVal) {
+		writeRowOneCell(cellVal, null, null);
+		
+		return this;
+	}
+	
+	/**
+	 * 写入一行数据
+	 */
+	public <T> RemexPoiWrite writeRowOneCell(Object cellVal, IWriteRowDiy poiWriteRowDiy, IWriteCellDiy poiWriteCellDiy) {
 		Object[] rowCellVals = new Object[] {cellVal};
-		
-		writeRow(rowCellVals);
-		
+
+		writeRow(rowCellVals, poiWriteRowDiy, poiWriteCellDiy);
+
 		return this;
 	}
 	
@@ -229,7 +312,20 @@ public class RemexPoiWrite {
 	 * @return
 	 */
 	public <T> RemexPoiWrite writeMerged(Object cellVal, int cellCount) {
-		writeMerged(cellVal, 1, cellCount);
+		writeMerged(cellVal, cellCount, null, null);
+		
+		return this;
+	}
+	
+	/**
+	 * 写入单元格，合并单元格
+	 * @param cellVal 单元格值
+	 * @param cellCount 合并的列数量 >=1
+	 * @return
+	 */
+	public <T> RemexPoiWrite writeMerged(Object cellVal, int cellCount, IWriteRowDiy poiWriteRowDiy
+			, IWriteCellDiy poiWriteCellDiy) {
+		writeMerged(cellVal, 1, cellCount, poiWriteRowDiy, poiWriteCellDiy);
 		
 		return this;
 	}
@@ -242,7 +338,7 @@ public class RemexPoiWrite {
 	 * @return
 	 */
 	public <T> RemexPoiWrite writeMerged(Object cellVal, int rowCount, int cellCount) {
-		writeMerged(cellVal, rowRollIndex, rowCount, cellCount);
+		writeMerged(cellVal, rowCount, cellCount, null, null);
 		
 		return this;
 	}
@@ -254,8 +350,9 @@ public class RemexPoiWrite {
 	 * @param cellCount 合并的列数量 >=1
 	 * @return
 	 */
-	public <T> RemexPoiWrite writeMerged(Object cellVal, int curRowRollIndex, int rowCount, int cellCount) {
-		writeMerged(cellVal, curRowRollIndex, 0, rowCount, cellCount);
+	public <T> RemexPoiWrite writeMerged(Object cellVal, int rowCount, int cellCount, IWriteRowDiy poiWriteRowDiy
+			, IWriteCellDiy poiWriteCellDiy) {
+		writeMerged(cellVal, rowRollIndex, 0, rowCount, cellCount, poiWriteRowDiy, poiWriteCellDiy);
 		
 		return this;
 	}
@@ -268,6 +365,20 @@ public class RemexPoiWrite {
 	 * @return
 	 */
 	public <T> RemexPoiWrite writeMerged(Object cellVal, int curRowRollIndex, int curCellRollIndex, int rowCount, int cellCount) {
+		writeMerged(cellVal, curRowRollIndex, curCellRollIndex, rowCount, cellCount, null, null);
+		
+		return this;
+	}
+	
+	/**
+	 * 写入单元格，合并单元格
+	 * @param cellVal 单元格值
+	 * @param rowCount 合并的行数量 >=1
+	 * @param cellCount 合并的列数量 >=1
+	 * @return
+	 */
+	public <T> RemexPoiWrite writeMerged(Object cellVal, int curRowRollIndex, int curCellRollIndex, int rowCount, int cellCount
+			, IWriteRowDiy poiWriteRowDiy, IWriteCellDiy poiWriteCellDiy) {
 		rowCount = rowCount < 1 ? 1 : rowCount;
 		cellCount = cellCount < 1 ? 1 : cellCount;
 		
@@ -275,7 +386,7 @@ public class RemexPoiWrite {
 		sheet.addMergedRegion(new CellRangeAddress(curRowRollIndex, curRowRollIndex + rowCount - 1
 				, curRowRollIndex, curCellRollIndex + cellCount - 1));
 		
-		writeRowOneCell(cellVal);
+		writeRowOneCell(cellVal, poiWriteRowDiy, poiWriteCellDiy);
 		
 		return this;
 	}
@@ -287,6 +398,9 @@ public class RemexPoiWrite {
 			, IWriteRowDiy poiWriteRowDiy, IWriteCellDiy poiWriteCellDiy, boolean isRollRow) {
 		Row row = createRow(curRowRollIndex);
 		
+		if (poiWriteRowDiy == null) {
+			poiWriteRowDiy = poiWriteRowDefaultDiy;
+		}
 		poiWriteRowDiy.diyRow(row, rowCellVals, dataIndex, curRowRollIndex);
 		
 		if (ValidateUtils.isNotEmpty(rowCellVals)) {
@@ -312,6 +426,9 @@ public class RemexPoiWrite {
 			, Object cellVal, IWriteCellDiy poiWriteCellDiy) {
 		Cell cell = createCell(row, curCellRollIndex);
 		
+		if (poiWriteCellDiy == null) {
+			poiWriteCellDiy = poiWriteCellDefaultDiy;
+		}
 		//自定义处理列对象
 		poiWriteCellDiy.diyCell(row, cell, cellVal, dataIndex, dataCellIndex, rowRollIndex, curCellRollIndex);
 		

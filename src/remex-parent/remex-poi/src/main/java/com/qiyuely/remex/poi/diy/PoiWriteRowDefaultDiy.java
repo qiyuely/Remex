@@ -1,4 +1,4 @@
-package com.qiyuely.remex.poi.val;
+package com.qiyuely.remex.poi.diy;
 
 import org.apache.poi.ss.usermodel.Row;
 
@@ -13,13 +13,13 @@ import com.qiyuely.remex.poi.interfaces.IWriteRowDiy;
 public class PoiWriteRowDefaultDiy implements IWriteRowDiy {
 
 	/**  默认行高度，默认乘256 */
-	protected int rowHeight;
+	protected double rowHeight = 1;
 	
 	public PoiWriteRowDefaultDiy() {
 		super();
 	}
 
-	public PoiWriteRowDefaultDiy(int rowHeight) {
+	public PoiWriteRowDefaultDiy(double rowHeight) {
 		super();
 		this.rowHeight = rowHeight;
 	}
@@ -35,11 +35,11 @@ public class PoiWriteRowDefaultDiy implements IWriteRowDiy {
 		}
 	}
 	
-	public void setRowHeight(int rowHeight) {
+	public void setRowHeight(double rowHeight) {
 		this.rowHeight = rowHeight;
 	}
 	
-	public int getRowHeight() {
+	public double getRowHeight() {
 		return rowHeight;
 	}
 }

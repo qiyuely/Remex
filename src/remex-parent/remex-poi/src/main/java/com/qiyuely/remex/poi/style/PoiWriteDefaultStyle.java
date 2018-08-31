@@ -1,8 +1,11 @@
 package com.qiyuely.remex.poi.style;
 
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 
 /**
@@ -40,7 +43,13 @@ public class PoiWriteDefaultStyle implements IPoiWriteStyle {
 	public CellStyle getDataStyle(Workbook workbook) {
 		CellStyle style = workbook.createCellStyle();
 		style.setFont(getDataFont(workbook));  //设置内容字体样式
-		style.setAlignment(HorizontalAlignment.CENTER);  //居中
+		style.setAlignment(HorizontalAlignment.CENTER);  //水平居中
+		style.setVerticalAlignment(VerticalAlignment.CENTER);  //垂直居中
+		//边框
+		style.setBorderTop(BorderStyle.THIN);
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderLeft(BorderStyle.THIN);
+		style.setBorderRight(BorderStyle.THIN);
 		return style;
 	}
 
@@ -61,11 +70,16 @@ public class PoiWriteDefaultStyle implements IPoiWriteStyle {
 	public CellStyle getCellTitleStyle(Workbook workbook) {
 		CellStyle style = workbook.createCellStyle();
 		style.setFont(getCellTitleFont(workbook));  //设置标题字体样式
-		style.setAlignment(HorizontalAlignment.CENTER);  //居中
-//		style.setBorderTop(BorderStyle.THIN);
-//		style.setBorderBottom(BorderStyle.THIN);
-//		style.setBorderLeft(BorderStyle.THIN);
-//		style.setBorderRight(BorderStyle.THIN);
+		style.setAlignment(HorizontalAlignment.CENTER);  //水平居中
+		style.setVerticalAlignment(VerticalAlignment.CENTER);  //垂直居中
+		//背景色
+		style.setFillPattern(FillPatternType.SOLID_FOREGROUND);  
+		style.setFillForegroundColor((short) 0x16);
+		//边框
+		style.setBorderTop(BorderStyle.THIN);
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderLeft(BorderStyle.THIN);
+		style.setBorderRight(BorderStyle.THIN);
 		return style;
 	}
 
@@ -87,11 +101,13 @@ public class PoiWriteDefaultStyle implements IPoiWriteStyle {
 	public CellStyle getTitleStyle(Workbook workbook) {
 		CellStyle style = workbook.createCellStyle();
 		style.setFont(getTitleFont(workbook));  //设置标题字体样式
-		style.setAlignment(HorizontalAlignment.CENTER);  //居中
-//		style.setBorderTop(BorderStyle.THIN);
-//		style.setBorderBottom(BorderStyle.THIN);
-//		style.setBorderLeft(BorderStyle.THIN);
-//		style.setBorderRight(BorderStyle.THIN);
+		style.setAlignment(HorizontalAlignment.CENTER);  //水平居中
+		style.setVerticalAlignment(VerticalAlignment.CENTER);  //垂直居中
+		//边框
+		style.setBorderTop(BorderStyle.THIN);
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderLeft(BorderStyle.THIN);
+		style.setBorderRight(BorderStyle.THIN);
 		return style;
 	}
 
