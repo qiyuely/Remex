@@ -8,6 +8,7 @@
   <modules>
   	<module>remex-core</module>
   	<module>remex-poi</module>
+    <module>remex-rocketmq</module>
   </modules>
   
   <properties>
