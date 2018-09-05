@@ -1,4 +1,4 @@
-package com.qiyuely.remex.rocketmq.producer.config;
+package com.qiyuely.remex.rocketmq.producer;
 
 import org.apache.rocketmq.common.message.Message;
 
@@ -10,7 +10,7 @@ import com.alibaba.fastjson.JSONObject;
  * @author Qiaoxin.Hong
  *
  */
-public abstract class BaseMqProducerDefaultSender extends BaseMqProducerSender {
+public class BaseMqProducerDefaultSender extends BaseMqProducerSender {
 	
 	/** mq主题 */
 	protected String topic;

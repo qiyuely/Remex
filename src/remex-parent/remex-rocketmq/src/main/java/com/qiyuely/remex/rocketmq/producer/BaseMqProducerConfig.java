@@ -1,4 +1,4 @@
-package com.qiyuely.remex.rocketmq.producer.config;
+package com.qiyuely.remex.rocketmq.producer;
 
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 

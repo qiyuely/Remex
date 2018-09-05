@@ -1,4 +1,4 @@
-package com.qiyuely.remex.rocketmq.producer.config;
+package com.qiyuely.remex.rocketmq.producer;
 
 import org.apache.rocketmq.client.producer.MQProducer;
 import org.apache.rocketmq.common.message.Message;
@@ -11,13 +11,10 @@ import com.qiyuely.remex.rocketmq.exception.RemexMqException;
  * @author Qiaoxin.Hong
  *
  */
-public abstract class BaseMqProducerSender {
+public class BaseMqProducerSender {
 	
-	/**
-	 * 取得mq生产者
-	 * @return
-	 */
-	protected abstract MQProducer getProducer();
+	/** mq生产者 */
+	protected MQProducer producer;
 	
 	/**
 	 * 发送
@@ -29,5 +26,13 @@ public abstract class BaseMqProducerSender {
 		} catch (Exception e) {
 			throw new RemexMqException("Mq producer send error!", e);
 		}
+	}
+
+	public MQProducer getProducer() {
+		return producer;
+	}
+
+	public void setProducer(MQProducer producer) {
+		this.producer = producer;
 	}
 }
