@@ -9,6 +9,8 @@
   	<module>remex-core</module>
   	<module>remex-poi</module>
     <module>remex-rocketmq</module>
+    <module>remex-aspectj</module>
+    <module>remex-hvalidator</module>
   </modules>
   
   <properties>
@@ -16,6 +18,7 @@
 	<encoding>UTF-8</encoding>
 	<remex.version>0.0.1-SNAPSHOT</remex.version>
 	<poi.version>3.17</poi.version>
+	<spring.boot.version>1.5.7.RELEASE</spring.boot.version>
   </properties>
   
   <dependencyManagement>
@@ -72,6 +75,36 @@
 		    <groupId>com.alibaba</groupId>
 		    <artifactId>fastjson</artifactId>
 		    <version>1.2.47</version>
+		</dependency>
+		<dependency>
+		    <groupId>commons-beanutils</groupId>
+		    <artifactId>commons-beanutils</artifactId>
+		    <version>1.9.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+			<version>${spring.boot.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-api</artifactId>
+		    <version>1.7.25</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.hibernate.validator</groupId>
+		    <artifactId>hibernate-validator</artifactId>
+		    <version>6.0.13.Final</version>
+		</dependency>
+		<dependency>
+		    <groupId>javax.validation</groupId>
+		    <artifactId>validation-api</artifactId>
+		    <version>2.0.1.Final</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.alibaba</groupId>
+		    <artifactId>fastjson</artifactId>
+		    <version>1.2.51</version>
 		</dependency>
   	</dependencies>
   </dependencyManagement>
