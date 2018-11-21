@@ -43,4 +43,14 @@ public class JsonUtils {
 				, SerializerFeature.DisableCircularReferenceDetect);
 		return json;
 	}
+	
+	/**
+	 * 对象转换为jons
+	 * @param obj
+	 * @return
+	 */
+	public static String toJson(Object obj) {
+		String json = JSON.toJSONString(obj);
+		return json;
+	}
 }
