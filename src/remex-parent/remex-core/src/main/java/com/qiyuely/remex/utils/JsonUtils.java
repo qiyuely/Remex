@@ -18,7 +18,7 @@ import com.alibaba.fastjson.serializer.PropertyPreFilter;
 public class JsonUtils {
 	
 	/**
-	 * 过滤器，对象转换为jons，偏向于打印日志使用
+	 * 过滤器，对象转换为json，偏向于打印日志使用
 	 */
 	private static final SerializeFilter[] jsonLogFilters = {new PropertyPreFilter() {
 		@Override
@@ -33,7 +33,7 @@ public class JsonUtils {
 	}};
 	
 	/**
-	 * 对象转换为jons，偏向于打印日志使用
+	 * 对象转换为json，偏向于打印日志使用
 	 * @param obj
 	 * @return
 	 */
@@ -45,12 +45,22 @@ public class JsonUtils {
 	}
 	
 	/**
-	 * 对象转换为jons
+	 * 对象转换为json
 	 * @param obj
 	 * @return
 	 */
 	public static String toJson(Object obj) {
 		String json = JSON.toJSONString(obj);
 		return json;
+	}
+	
+	/**
+	 * json转换为对象
+	 * @param text
+	 * @param clazz
+	 * @return
+	 */
+	public static <T> T parse(String text, Class<T> clazz) {
+		return JSON.parseObject(text, clazz);
 	}
 }

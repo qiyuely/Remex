@@ -11,6 +11,7 @@
     <module>remex-rocketmq</module>
     <module>remex-aspectj</module>
     <module>remex-hvalidator</module>
+    <module>remex-mongodb</module>
   </modules>
   
   <properties>
@@ -105,6 +106,11 @@
 		    <groupId>com.alibaba</groupId>
 		    <artifactId>fastjson</artifactId>
 		    <version>1.2.51</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+			<version>${spring.boot.version}</version>
 		</dependency>
   	</dependencies>
   </dependencyManagement>
