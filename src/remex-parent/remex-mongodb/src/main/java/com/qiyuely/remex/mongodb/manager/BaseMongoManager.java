@@ -5,12 +5,15 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.mongodb.DBCollection;
+import com.qiyuely.remex.mongodb.annotation.MongoManagerSetting;
+import com.qiyuely.remex.utils.Assert;
 import com.qiyuely.remex.utils.ValidateUtils;
 
 /**
@@ -24,6 +27,9 @@ public abstract class BaseMongoManager<T> {
 	
 	@Autowired
 	protected MongoTemplate mongoTemplate;
+	
+	/** 数据集名称 */
+	protected String collectionName;
 
 	/**
 	 * 数据实体Class
@@ -43,7 +49,19 @@ public abstract class BaseMongoManager<T> {
 	 * @return
 	 */
 	public String getCollectionName() {
-		return entityClass.getSimpleName();
+		if (collectionName == null) {
+			Class<?> clazz = this.getClass();
+			//如果使用了默认的配置项
+			if (clazz.isAnnotationPresent(MongoManagerSetting.class)) {
+				MongoManagerSetting mongoManagerSetting = AnnotationUtils.findAnnotation(this.getClass(), MongoManagerSetting.class);
+				Assert.notNull(mongoManagerSetting);
+				
+				collectionName = mongoManagerSetting.name();
+			} else {  //无任何配置，则默认使用实体名作为数据集名称
+				collectionName = entityClass.getSimpleName();
+			}
+		}
+		return collectionName;
 	}
 	
 	/**
@@ -93,25 +111,46 @@ public abstract class BaseMongoManager<T> {
 	
 	/**
 	 * 查询列表
-	 * @param count 查询数量
+	 * @param pageSize 查询数量
 	 * @param andCrArr 条件
 	 * @return
 	 */
-	public List<T> find(Integer count, Criteria...andCrArr) {
-		return find(count, null, andCrArr);
+	public List<T> find(Integer pageSize, Criteria...andCrArr) {
+		return find(null, pageSize, null, andCrArr);
 	}
 	
 	/**
 	 * 查询列表
-	 * @param count 查询数量
+	 * @param pageSize 查询数量
+	 * @param andCrArr 条件
+	 * @return
+	 */
+	public List<T> find(Integer pageNum, Integer pageSize, Criteria...andCrArr) {
+		return find(pageNum, pageSize, null, andCrArr);
+	}
+	
+	/**
+	 * 查询列表
+	 * @param pageSize 查询数量
 	 * @param sort 排序
 	 * @param andCrArr 条件
 	 * @return
 	 */
-	public List<T> find(Integer count, Sort sort, Criteria...andCrArr) {
+	public List<T> find(Integer pageSize, Sort sort, Criteria...andCrArr) {
+		return find(null, pageSize, sort, andCrArr);
+	}
+	
+	/**
+	 * 查询列表
+	 * @param pageSize 查询数量
+	 * @param sort 排序
+	 * @param andCrArr 条件
+	 * @return
+	 */
+	public List<T> find(Integer pageNum, Integer pageSize, Sort sort, Criteria...andCrArr) {
 		Query query = new Query();
 		
-		packQuery(query, count, sort, andCrArr);
+		packQuery(query, pageNum, pageSize, sort, andCrArr);
 		
 		return find(query);
 	}
@@ -122,27 +161,48 @@ public abstract class BaseMongoManager<T> {
 	 * @param andCrArr
 	 */
 	protected void packQuery(Query query, Criteria...andCrArr) {
-		packQuery(query, null, null, andCrArr);
+		packQuery(query, null, null, null, andCrArr);
 	}
 	
 	/**
 	 * 封装Query对象
 	 * @param query query对象
-	 * @param count 查询数量
+	 * @param pageSize 查询数量
 	 * @param andCrArr 条件
 	 */
-	protected void packQuery(Query query, Integer count, Criteria...andCrArr) {
-		packQuery(query, count, null, andCrArr);
+	protected void packQuery(Query query, Integer pageSize, Criteria...andCrArr) {
+		packQuery(query, null, pageSize, andCrArr);
 	}
 	
 	/**
 	 * 封装Query对象
 	 * @param query query对象
-	 * @param count 查询数量
+	 * @param pageSize 查询数量
+	 * @param andCrArr 条件
+	 */
+	protected void packQuery(Query query, Integer pageNum, Integer pageSize, Criteria...andCrArr) {
+		packQuery(query, pageNum, pageSize, null, andCrArr);
+	}
+	
+	/**
+	 * 封装Query对象
+	 * @param query query对象
+	 * @param pageSize 查询数量
 	 * @param sort 排序
 	 * @param andCrArr 条件
 	 */
-	protected void packQuery(Query query, Integer count, Sort sort, Criteria...andCrArr) {
+	protected void packQuery(Query query, Integer pageSize, Sort sort, Criteria...andCrArr) {
+		packQuery(query, null, pageSize, sort, andCrArr);
+	}
+	
+	/**
+	 * 封装Query对象
+	 * @param query query对象
+	 * @param pageSize 查询数量
+	 * @param sort 排序
+	 * @param andCrArr 条件
+	 */
+	protected void packQuery(Query query, Integer pageNum, Integer pageSize, Sort sort, Criteria...andCrArr) {
 		if (query != null) {
 			
 			//条件
@@ -156,10 +216,31 @@ public abstract class BaseMongoManager<T> {
 				query.with(sort);
 			}
 			
-			//数量
-			if (count != null && count >= 0) {
-				query.limit(count);
+			int skip = -1;
+			int limit = -1;
+			
+			if (pageSize != null) {
+				limit = 0;
+				if (pageSize > 0) {
+					limit = pageSize;
+				}
 			}
+			
+			if (pageNum != null) {
+				skip = 0;
+				if (pageNum > 0 && limit > 0) {
+					skip = (pageNum - 1) * limit;
+				}
+			}
+			
+			if (skip != -1) {
+				query.skip(skip);
+			}
+			
+			if (limit != -1) {
+				query.limit(limit);
+			}
+			
 		}
 	}
 	

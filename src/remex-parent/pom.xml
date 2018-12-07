@@ -12,6 +12,8 @@
     <module>remex-aspectj</module>
     <module>remex-hvalidator</module>
     <module>remex-mongodb</module>
+    <module>remex-jasperreport</module>
+    <module>remex-dict</module>
   </modules>
   
   <properties>
@@ -33,6 +35,11 @@
 		<dependency>
 			<groupId>com.qiyuely.remex</groupId>
 	    	<artifactId>remex-poi</artifactId>
+	    	<version>${remex.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.qiyuely.remex</groupId>
+	    	<artifactId>remex-dict</artifactId>
 	    	<version>${remex.version}</version>
 		</dependency>
   		<!-- remex -->
