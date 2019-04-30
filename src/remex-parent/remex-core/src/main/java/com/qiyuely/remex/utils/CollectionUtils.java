@@ -1,5 +1,7 @@
 package com.qiyuely.remex.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,5 +30,14 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
 	 */
 	public static boolean isNotEmpty(Map<?, ?> map) {
 		return !isEmpty(map);
+	}
+	
+	/**
+	 * 默认list，null  =>  new ArrayList<>() 
+	 * @param list
+	 * @return
+	 */
+	public static <T> List<T> defaultList(List<T> list) {
+		return list == null ? new ArrayList<T>() : list;
 	}
 }

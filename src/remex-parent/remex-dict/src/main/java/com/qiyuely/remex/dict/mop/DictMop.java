@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.qiyuely.remex.dict.annotation.Dict;
+import com.qiyuely.remex.dict.annotation.DictSub;
 import com.qiyuely.remex.dict.interfaces.DictSource;
 import com.qiyuely.remex.utils.CollectionUtils;
 import com.qiyuely.remex.utils.StringUtils;
@@ -100,6 +101,10 @@ public class DictMop {
 			
 			if (ValidateUtils.isNotEmpty(fieldArr)) {
 				for (Field field : fieldArr) {
+					Class<?> fieldClass = field.getType();
+					Object fieldValue = field.get(bean);
+					
+					//启用了字典翻译配置
 					if (field.isAnnotationPresent(Dict.class)) {
 						
 						Dict dict = field.getAnnotation(Dict.class);
@@ -117,6 +122,19 @@ public class DictMop {
 									field.setAccessible(true);
 									field.set(bean, dictVal);
 								}
+							}
+						}
+					} else if (field.isAnnotationPresent(DictSub.class)) {  //子对象进行字典翻译
+						//处理子对象
+						if (fieldValue != null) {
+							//集合
+							if (Collection.class.equals(fieldClass)) {
+								Collection<?> coll = (Collection<?>) fieldValue;
+								for (Object item : coll) {
+									tranBean(item);
+								}
+							} else {  //普通对象
+								tranBean(fieldValue);
 							}
 						}
 					}
